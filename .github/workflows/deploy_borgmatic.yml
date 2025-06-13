@@ -74,7 +74,7 @@ jobs:
           
       - name: Validate borgmatic config and test job
         run: |
-          ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'bash -s' <<'EOF'
             export BORG_PASSPHRASE="${{ secrets.BORG_REPO_PASSPHRASE }}"
             borgmatic --config /etc/borgmatic/config.yaml --verbosity 1 --dry-run
           EOF
