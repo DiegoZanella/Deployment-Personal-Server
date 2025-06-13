@@ -24,4 +24,4 @@ jobs:
 
       - name: Run docker compose as diego on polarbear
         run: |
-          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/proxy && docker compose -f memos.yml up -d'
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/memos && docker compose -f memos.yml up -d'
