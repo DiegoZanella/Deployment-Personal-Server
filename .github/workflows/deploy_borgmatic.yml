@@ -63,7 +63,7 @@ jobs:
       - name: Initialize remote Borg repo on bamboo if needed
         run: |
           ssh -o StrictHostKeyChecking=no diego@bamboo 'bash -s' <<EOF
-            export BORG_REPO=/home/diego/borg_backups/polarbearbackup
+            export BORG_REPO=/home/diego/borg_backups/polarbear_backup
             export BORG_PASSPHRASE="${{ secrets.BORG_REPO_PASSPHRASE }}"
       
             mkdir -p "\$BORG_REPO"
