@@ -15,16 +15,18 @@ jobs:
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          tags: tag:ci
+          tags: tag:admin
       
-      - name: Ensure user and group 'diego' exist
+      - name: Create user 'diego' and testing_dir on polarbear
         run: |
-          if ! id -u diego >/dev/null 2>&1; then
-            sudo groupadd -f diego
-            sudo useradd -m -g diego diego
-          fi
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'bash -s' <<'EOF'
+            # Ensure group and user exist
+            if ! id -u diego >/dev/null 2>&1; then
+              groupadd -f diego
+              useradd -m -g diego diego
+            fi
 
-      - name: Create testing_dir owned by diego
-        run: |
-          sudo mkdir -p /home/diego/testing_dir
-          sudo chown diego:diego /home/diego/testing_dir
+            # Create the directory and set ownership
+            mkdir -p /home/diego/testing_dir
+            chown diego:diego /home/diego/testing_dir
+          EOF
