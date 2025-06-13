@@ -26,14 +26,17 @@ jobs:
             fi
           EOF
       
-      - name: Ensure Docker is installed on polarbear
+      - name: Ensure docker compose v2 is installed on polarbear
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
-            if ! command -v docker >/dev/null 2>&1; then
-              apt-get update
-              apt-get install -y docker.io
-              systemctl enable docker
-              systemctl start docker
+            # Check if docker compose v2 is already available
+            if ! docker compose version >/dev/null 2>&1; then
+              mkdir -p ~/.docker/cli-plugins/
+              curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+              chmod +x ~/.docker/cli-plugins/docker-compose
+      
+              # Ensure docker recognizes the plugin path
+              export PATH=$PATH:~/.docker/cli-plugins
             fi
           EOF
 
