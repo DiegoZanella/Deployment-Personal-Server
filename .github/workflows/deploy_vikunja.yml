@@ -17,6 +17,10 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:admin
 
+      - name: Generate docker-compose file with domain injected
+        run: |
+          sed "s|\${DOMAIN}|${{ secrets.DOMAIN }}|g" vikunja.template.yml > vikunja.yml
+
       - name: Copy Docker Compose file to polarbear:/home/diego/vikunja
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/vikunja && chown diego:diego /home/diego/vikunja'
