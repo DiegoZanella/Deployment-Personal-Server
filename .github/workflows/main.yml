@@ -1,4 +1,4 @@
-name: CI
+name: Initial deployment # installs docker and nginx proxy manager
 
 on:
   workflow_dispatch:
