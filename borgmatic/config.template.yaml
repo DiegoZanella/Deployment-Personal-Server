@@ -1,0 +1,25 @@
+location:
+  source_directories:
+    - ${VIKUNJA_DATA_DIR}  # vikunja data
+    - ${NPM_DATA_DIR}  # proxy manager data
+    - ${MEMOS_DATA_DIR}  # memos data
+  repositories:
+    - ${BACKUP_REPO_LOC}  # borg backup location
+
+storage:
+  # No compression used
+  compression: none
+
+retention:
+  # Keep one backup per day for the last 30 days
+  keep_daily: 30
+  # No weekly retention needed
+  keep_weekly: 0
+  # Keep one backup per month indefinitely (or adjust if needed)
+  keep_monthly: 6
+
+consistency:
+  checks:
+    - repository
+    - archives
+  check_last: 3
