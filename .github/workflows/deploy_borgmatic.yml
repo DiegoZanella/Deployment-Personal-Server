@@ -41,6 +41,10 @@ jobs:
             fi
           EOF
 
+      - name: Ensure remote repo exists on bamboo
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@bamboo 'mkdir -p /home/diego/borg_backups && chmod 700 /home/diego/borg_backups'
+            
       - name: Generate borgmatic config from template
         run: |
           export VIKUNJA_DB_DIR="${{ secrets.VIKUNJA_DB_DIR }}"
