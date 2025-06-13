@@ -78,3 +78,15 @@ jobs:
             export BORG_PASSPHRASE="${{ secrets.BORG_REPO_PASSPHRASE }}"
             borgmatic --config /etc/borgmatic/config.yaml --verbosity 1 --dry-run
           EOF
+
+      - name: Set up cronjob for diego to run borgmatic daily
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
+            CRON_CMD="BORG_PASSPHRASE='${{ secrets.BORG_REPO_PASSPHRASE }}' /usr/bin/borgmatic --config /etc/borgmatic/config.yaml --verbosity 1 >> /var/log/borgmatic.log 2>&1"
+      
+            # Escape special chars for cron (especially %)
+            ESCAPED_CMD=$(echo "$CRON_CMD" | sed 's/%/\\%/g')
+      
+            # Add to diego's crontab (replaces if already exists)
+            (crontab -u diego -l 2>/dev/null | grep -v borgmatic; echo "03 13 * * * $ESCAPED_CMD") | crontab -u diego -
+          EOF
