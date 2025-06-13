@@ -24,7 +24,7 @@ jobs:
       - name: Copy Docker Compose file to polarbear:/home/diego/vikunja
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/vikunja && chown diego:diego /home/diego/vikunja'
-          scp -o StrictHostKeyChecking=no ./memos.yml root@polarbear:/home/diego/vikunja/
+          scp -o StrictHostKeyChecking=no ./vikunja.yml root@polarbear:/home/diego/vikunja/
 
       - name: Run docker compose as diego on polarbear
         run: |
