@@ -25,8 +25,10 @@ jobs:
             # Update and install both borgbackup and borgmatic from Ubuntu's repo
             apt-get update
             apt-get install -y borgbackup borgmatic
-          EOF
 
+            mkdir -p /etc/borgmatic/
+          EOF
+          
       - name: Create Borg repository if not exists
         run: |
           ssh -o StrictHostKeyChecking=no diego@polarbear 'bash -s' <<EOF
@@ -37,8 +39,6 @@ jobs:
             if [ ! -f "\$BORG_REPO/config" ]; then
               borg init --encryption=repokey-blake2 "\$BORG_REPO"
             fi
-
-            mkdir -p /etc/borgmatic/
           EOF
 
       - name: Generate borgmatic config from template
