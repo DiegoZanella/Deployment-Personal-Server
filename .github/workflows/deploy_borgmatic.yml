@@ -37,6 +37,8 @@ jobs:
             if [ ! -f "\$BORG_REPO/config" ]; then
               borg init --encryption=repokey-blake2 "\$BORG_REPO"
             fi
+
+            mkdir -p /etc/borgmatic/
           EOF
 
       - name: Generate borgmatic config from template
