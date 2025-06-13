@@ -1,7 +1,9 @@
 location:
   source_directories:
-    - ${VIKUNJA_DATA_DIR}  # vikunja data
+    - ${VIKUNJA_DB_DIR}  # vikunja data
+    - ${VIKUNJA_FILES_DIR} # vikunja data
     - ${NPM_DATA_DIR}  # proxy manager data
+    - ${NPM_CERTS_DIR} # proxy manager data
     - ${MEMOS_DATA_DIR}  # memos data
   repositories:
     - ${BACKUP_REPO_LOC}  # borg backup location
