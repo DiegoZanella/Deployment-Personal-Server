@@ -14,5 +14,4 @@ services:
     volumes:
       - ./files:/app/vikunja/files
       - ./db:/db
-    networks:
     restart: always
