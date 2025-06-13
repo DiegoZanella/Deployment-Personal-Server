@@ -1,0 +1,54 @@
+name: Deploy Borg
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:admin
+
+      - name: Install Borg and Borgmatic on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
+            apt-get update
+            apt-get install -y borgbackup
+            pip3 install --upgrade pip
+            pip3 install borgmatic
+          EOF
+
+      - name: Create Borg repository if not exists
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'bash -s' <<EOF
+            export BORG_REPO="${{ secrets.BORG_REPO_BASE }}/polarbear_backup"
+            mkdir -p "\$BORG_REPO"
+            if [ ! -f "\$BORG_REPO/config" ]; then
+              borg init --encryption=repokey-blake2 "\$BORG_REPO"
+            fi
+          EOF
+
+      - name: Generate borgmatic config from template
+        run: |
+          export VIKUNJA_DATA_DIR="${{ secrets.VIKUNJA_DATA_DIR }}"
+          export NPM_DATA_DIR="${{ secrets.NPM_DATA_DIR }}"
+          export MEMOS_DATA_DIR="${{ secrets.MEMOS_DATA_DIR }}"
+          export BACKUP_REPO_LOC="${{ secrets.BACKUP_REPO_LOC }}"
+      
+          envsubst < borgmatic/config.template.yml > borgmatic/config.yml
+          
+      - name: Copy borgmatic config to server
+        run: |
+          scp -o StrictHostKeyChecking=no borgmatic/config.yml root@polarbear:/etc/borgmatic/config.yaml
+
+      - name: Validate borgmatic config and test job
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'borgmatic --config /etc/borgmatic/config.yaml --verbosity 1 --dry-run'
