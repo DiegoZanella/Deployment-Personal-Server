@@ -48,11 +48,11 @@ jobs:
           export MEMOS_DATA_DIR="${{ secrets.MEMOS_DATA_DIR }}"
           export BACKUP_REPO_LOC="${{ secrets.BACKUP_REPO_LOC }}"
       
-          envsubst < borgmatic/config.template.yml > borgmatic/config.yml
+          envsubst < borgmatic/config.template.yaml > borgmatic/config.yaml
           
       - name: Copy borgmatic config to server
         run: |
-          scp -o StrictHostKeyChecking=no borgmatic/config.yml root@polarbear:/etc/borgmatic/config.yaml
+          scp -o StrictHostKeyChecking=no borgmatic/config.yaml root@polarbear:/etc/borgmatic/config.yaml
 
       - name: Validate borgmatic config and test job
         run: |
