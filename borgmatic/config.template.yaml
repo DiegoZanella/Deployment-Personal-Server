@@ -7,6 +7,7 @@ location:
     - ${MEMOS_DATA_DIR}  # memos data
   repositories:
     - ${BACKUP_REPO_LOC}  # borg backup location
+    - ssh://diego@bamboo:22${BACKUP_REPO_LOC}/polarbear_backup
 
 storage:
   # No compression used
