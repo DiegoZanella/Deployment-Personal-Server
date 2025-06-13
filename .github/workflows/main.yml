@@ -32,14 +32,12 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
             set -eux
       
-            # Clean any old Docker
-            apt-get remove -y docker docker-engine docker.io containerd runc || true
-      
             apt-get update
             apt-get install -y ca-certificates curl gnupg lsb-release
       
             install -m 0755 -d /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+              gpg --dearmor --batch --yes -o /etc/apt/keyrings/docker.gpg
             chmod a+r /etc/apt/keyrings/docker.gpg
       
             echo \
@@ -50,7 +48,6 @@ jobs:
             apt-get update
             apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       
-            # Try starting Docker, fallback if systemd is unavailable
             if command -v systemctl >/dev/null 2>&1; then
               systemctl start docker || journalctl -xeu docker.service || true
             else
@@ -58,11 +55,10 @@ jobs:
               sleep 5
             fi
       
-            # Confirm docker is working
             docker version || (echo "Docker failed to start" && exit 1)
             docker compose version
           EOF
-      
+          
       - name: Add diego to docker group on polarbear
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'usermod -aG docker diego'
