@@ -1,0 +1,27 @@
+name: Deploy Vikunja 
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:admin
+
+      - name: Copy Docker Compose file to polarbear:/home/diego/vikunja
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/vikunja && chown diego:diego /home/diego/vikunja'
+          scp -o StrictHostKeyChecking=no ./memos.yml root@polarbear:/home/diego/vikunja/
+
+      - name: Run docker compose as diego on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/vikunja && docker compose -f vikunja.yml up -d'
