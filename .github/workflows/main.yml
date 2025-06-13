@@ -17,16 +17,38 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:admin
       
-      - name: Create user 'diego' and testing_dir on polarbear
+      - name: Ensure user 'diego' exists on polarbear
         run: |
-          ssh -o StrictHostKeyChecking=no diego@polarbear 'bash -s' <<'EOF'
-            # Ensure group and user exist
+          ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
             if ! id -u diego >/dev/null 2>&1; then
               groupadd -f diego
               useradd -m -g diego diego
             fi
-
-            # Create the directory and set ownership
-            mkdir -p /home/diego/testing_dir
-            chown diego:diego /home/diego/testing_dir
           EOF
+      
+      - name: Ensure Docker is installed on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
+            if ! command -v docker >/dev/null 2>&1; then
+              apt-get update
+              apt-get install -y docker.io
+              systemctl enable docker
+              systemctl start docker
+            fi
+          EOF
+
+      
+      - name: Add diego to docker group on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'usermod -aG docker diego'
+
+      - name: Copy Docker Compose file to polarbear:/home/diego/proxy
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/proxy && chown diego:diego /home/diego/proxy'
+          scp -o StrictHostKeyChecking=no ./install_nginx.yml root@polarbear:/home/diego/proxy/
+
+      - name: Run docker compose as diego on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/proxy && docker compose -f install_nginx.yml up -d'
+
+      
