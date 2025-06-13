@@ -1,0 +1,18 @@
+services:
+  vikunja:
+    image: vikunja/vikunja
+    container_name: vikunja
+    ports:
+      - "3456:3456"
+    environment:
+      VIKUNJA_SERVICE_PUBLIC_URL: ${DOMAIN}
+      VIKUNJA_SERVICE_ENABLEEMAILREMINDERS: 1
+      VIKUNJA_MAILER_ENABLED: true
+      VIKUNJA_MAILER_FORCESSL: 0
+      VIKUNJA_MAILER_AUTHTYPE: plain
+
+    volumes:
+      - ./files:/app/vikunja/files
+      - ./db:/db
+    networks:
+    restart: always
