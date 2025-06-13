@@ -1,0 +1,27 @@
+name: Deploy memos
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:admin
+
+      - name: Copy Docker Compose file to polarbear:/home/diego/memos
+        run: |
+          ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/memos && chown diego:diego /home/diego/memos'
+          scp -o StrictHostKeyChecking=no ./memos.yml root@polarbear:/home/diego/memos/
+
+      - name: Run docker compose as diego on polarbear
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/proxy && docker compose -f memos.yml up -d'
