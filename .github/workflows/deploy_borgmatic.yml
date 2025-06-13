@@ -93,5 +93,5 @@ jobs:
             ESCAPED_CMD=$(echo "$CRON_CMD" | sed 's/%/\\%/g')
       
             # Add to diego's crontab (replaces if already exists)
-            (crontab -u diego -l 2>/dev/null | grep -v borgmatic; echo "03 13 * * * $ESCAPED_CMD") | crontab -u diego -
+            (crontab -u diego -l 2>/dev/null | grep -v borgmatic; echo "00 06 * * * $ESCAPED_CMD") | crontab -u diego -
           EOF
