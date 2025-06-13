@@ -60,6 +60,18 @@ jobs:
         run: |
           scp -o StrictHostKeyChecking=no borgmatic/config.yaml root@polarbear:/etc/borgmatic/config.yaml
 
+      - name: Initialize remote Borg repo on bamboo if needed
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@bamboo 'bash -s' <<EOF
+            export BORG_REPO=/home/diego/borg_backups
+            export BORG_PASSPHRASE="${{ secrets.BORG_REPO_PASSPHRASE }}"
+      
+            mkdir -p "\$BORG_REPO"
+            if [ ! -f "\$BORG_REPO/config" ]; then
+              borg init --encryption=repokey-blake2 "\$BORG_REPO"
+            fi
+          EOF
+          
       - name: Validate borgmatic config and test job
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
