@@ -20,10 +20,11 @@ jobs:
       - name: Install Borg and Borgmatic on polarbear
         run: |
           ssh -o StrictHostKeyChecking=no root@polarbear 'bash -s' <<'EOF'
+            set -eux
+      
+            # Update and install both borgbackup and borgmatic from Ubuntu's repo
             apt-get update
-            apt-get install -y borgbackup
-            pip3 install --upgrade pip
-            pip3 install borgmatic
+            apt-get install -y borgbackup borgmatic
           EOF
 
       - name: Create Borg repository if not exists
