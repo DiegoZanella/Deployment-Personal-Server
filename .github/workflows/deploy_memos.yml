@@ -20,7 +20,7 @@ jobs:
       - name: Copy Docker Compose file to host:/home/diego/memos
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ vars.HOSTNAME }} 'mkdir -p ${{ vars.BASE_LOCATION }}/memos && chown ${{ vars.USER }}:${{ vars.GROUP }} ${{ vars.BASE_LOCATION }}/memos'
-          scp -o StrictHostKeyChecking=no ./memos.yml root@${{ vars.HOSTNAME }} :${{ vars.BASE_LOCATION }}/memos/
+          scp -o StrictHostKeyChecking=no ./memos.yml root@${{ vars.HOSTNAME }}:${{ vars.BASE_LOCATION }}/memos/
 
       - name: Run docker compose on host
         run: |
