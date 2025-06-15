@@ -17,11 +17,11 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:admin
 
-      - name: Copy Docker Compose file to polarbear:/home/diego/memos
+      - name: Copy Docker Compose file to host:/home/diego/memos
         run: |
-          ssh -o StrictHostKeyChecking=no root@polarbear 'mkdir -p /home/diego/memos && chown diego:diego /home/diego/memos'
-          scp -o StrictHostKeyChecking=no ./memos.yml root@polarbear:/home/diego/memos/
+          ssh -o StrictHostKeyChecking=no root@${{ vars.HOSTNAME }} 'mkdir -p ${{ vars.BASE_LOCATION }}/memos && chown ${{ vars.USER }}:${{ vars.GROUP }} ${{ vars.BASE_LOCATION }}/memos'
+          scp -o StrictHostKeyChecking=no ./memos.yml root@${{ vars.HOSTNAME }} :${{ vars.BASE_LOCATION }}/memos/
 
-      - name: Run docker compose as diego on polarbear
+      - name: Run docker compose on host
         run: |
-          ssh -o StrictHostKeyChecking=no diego@polarbear 'cd /home/diego/memos && docker compose -f memos.yml up -d'
+          ssh -o StrictHostKeyChecking=no ${{ vars.USER }}@${{ vars.HOSTNAME }} 'cd ${{ vars.BASE_LOCATION }}/memos && docker compose -f memos.yml up -d'
