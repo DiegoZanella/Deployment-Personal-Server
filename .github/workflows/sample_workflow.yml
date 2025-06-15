@@ -1,0 +1,22 @@
+name: Sample Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:admin
+
+      - name: Print repo variables to file
+        run: |
+          ssh -o StrictHostKeyChecking=no diego@polarbear 'mkdir -p /home/diego/tmp && echo ${{ vars.DOMAIN }} >> /home/diego/tmp/sample_file.txt'
