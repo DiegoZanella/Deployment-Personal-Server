@@ -22,7 +22,7 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:admin
 
-      - name: Copy Docker Compose file to host:
+      - name: Copy Docker Compose file to host
         run: |
           ssh -o StrictHostKeyChecking=no root@${{ vars.HOSTNAME }} 'mkdir -p ${{ vars.BASE_LOCATION }}/memos && chown ${{ vars.USER }}:${{ vars.GROUP }} ${{ vars.BASE_LOCATION }}/memos'
           scp -o StrictHostKeyChecking=no ./memos.yml root@${{ vars.HOSTNAME }}:${{ vars.BASE_LOCATION }}/memos/
