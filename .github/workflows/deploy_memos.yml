@@ -51,7 +51,7 @@ jobs:
             mkdir -p ${{ vars.BASE_LOCATION }}/memos/data &&
             tar xzf ${{ vars.BASE_LOCATION }}/memos_data.tar.gz -C ${{ vars.BASE_LOCATION }}/memos/data --strip-components=1 &&
             rm ${{ vars.BASE_LOCATION }}/memos_data.tar.gz
-            
+          '
       - name: Run docker compose on host
         run: |
           ssh -o StrictHostKeyChecking=no ${{ vars.USER }}@${{ vars.HOSTNAME }} 'cd ${{ vars.BASE_LOCATION }}/memos && docker compose -f memos.yml up -d'
