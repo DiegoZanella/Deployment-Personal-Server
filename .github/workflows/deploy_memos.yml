@@ -33,6 +33,7 @@ jobs:
           echo "Restoring memos data from backup to host..."
 
           ssh -o StrictHostKeyChecking=no diego@bamboo '
+            export BORG_PASSPHRASE='${{ secrets.BORG_REPO_PASSPHRASE }}' &&
             mkdir -p ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp &&
             cd ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp &&
             borg list ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup --short | tail -n1 | \
