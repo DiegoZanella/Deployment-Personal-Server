@@ -2,6 +2,15 @@ name: Deploy memos
 
 on:
   workflow_dispatch:
+    inputs:
+      restore:
+        description: "Deploy memos using backup data"
+        required: "false"
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
   
 jobs:
   build:
@@ -22,6 +31,27 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@${{ vars.HOSTNAME }} 'mkdir -p ${{ vars.BASE_LOCATION }}/memos && chown ${{ vars.USER }}:${{ vars.GROUP }} ${{ vars.BASE_LOCATION }}/memos'
           scp -o StrictHostKeyChecking=no ./memos.yml root@${{ vars.HOSTNAME }}:${{ vars.BASE_LOCATION }}/memos/
 
+      - name: Restore memos data from backup
+        if: ${{ inputs.restore == 'true' }}
+        run: |
+          echo "Restoring memos data from backup to host..."
+          ssh -o StrictHostKeyChecking=no diego@polarbear '
+            mkdir -p ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp
+            cd ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp && 
+            borg list ${{ vars.BASE_LOCATION }}/polarbear_backup --short | tail -n1 | \
+              xargs -I {} borg extract ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup::{} memos_data &&
+            tar czf memos_data.tar.gz memos_data
+          '
+          
+          scp -o StrictHostKeyChecking=no diego@bamboo:${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp/memos_data.tar.gz /tmp/memos_data.tar.gz
+
+          scp -o StrictHostKeyChecking=no /tmp/memos_data.tar.gz diego@polarbear:${{ vars.BASE_LOCATION }}
+
+          ssh -o StrictHostKeyChecking=no diego@polarbear '
+            mkdir -p ${{ vars.BASE_LOCATION }}/memos/data &&
+            tar xzf ${{ vars.BASE_LOCATION }}/memos_data.tar.gz -C ${{ vars.BASE_LOCATION }}/memos/data --strip-components=1 &&
+            rm ${{ vars.BASE_LOCATION }}/memos_data.tar.gz
+            
       - name: Run docker compose on host
         run: |
           ssh -o StrictHostKeyChecking=no ${{ vars.USER }}@${{ vars.HOSTNAME }} 'cd ${{ vars.BASE_LOCATION }}/memos && docker compose -f memos.yml up -d'
