@@ -43,9 +43,9 @@ jobs:
           "
 
           scp -o StrictHostKeyChecking=no diego@bamboo:${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp/memos_data.tar.gz /tmp/memos_data.tar.gz
-          scp -o StrictHostKeyChecking=no /tmp/memos_data.tar.gz diego@polarbear:${{ vars.BASE_LOCATION }}
+          scp -o StrictHostKeyChecking=no /tmp/memos_data.tar.gz diego@${{ vars.HOSTNAME }}:${{ vars.BASE_LOCATION }}
 
-          ssh -o StrictHostKeyChecking=no diego@polarbear '
+          ssh -o StrictHostKeyChecking=no diego@${{ vars.HOSTNAME }} '
             mkdir -p ${{ vars.BASE_LOCATION }}/memos/data &&
             tar xzf ${{ vars.BASE_LOCATION }}/memos_data.tar.gz -C ${{ vars.BASE_LOCATION }}/memos/data --strip-components=1 &&
             rm ${{ vars.BASE_LOCATION }}/memos_data.tar.gz
