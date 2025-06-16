@@ -32,14 +32,15 @@ jobs:
         run: |
           echo "Restoring memos data from backup to host..."
 
-          ssh -o StrictHostKeyChecking=no diego@bamboo '
+          ssh -o StrictHostKeyChecking=no diego@bamboo "
             export BORG_PASSPHRASE='${{ secrets.BORG_REPO_PASSPHRASE }}' &&
             mkdir -p ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp &&
             cd ${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp &&
-            borg list ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup --short | tail -n1 | \
-              xargs -I {} borg extract ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup::{} memos_data &&
+            LATEST_ARCHIVE=\$(borg list ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup --short | tail -n1) &&
+            borg extract ${{ vars.BASE_LOCATION }}/borg_repos/polarbear_backup::\$LATEST_ARCHIVE home/diego/memos/data &&
+            mv home/diego/memos/data memos_data &&
             tar czf memos_data.tar.gz memos_data
-          '
+          "
 
           scp -o StrictHostKeyChecking=no diego@bamboo:${{ vars.BASE_LOCATION }}/tmp/memos_backup_tmp/memos_data.tar.gz /tmp/memos_data.tar.gz
           scp -o StrictHostKeyChecking=no /tmp/memos_data.tar.gz diego@polarbear:${{ vars.BASE_LOCATION }}
