@@ -5,7 +5,7 @@ on:
     inputs:
       restore:
         description: "Deploy memos using backup data"
-        required: "false"
+        required: false
         default: "false"
         type: choice
         options:
