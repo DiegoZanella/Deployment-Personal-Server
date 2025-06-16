@@ -7,10 +7,6 @@ on:
         description: "Deploy memos using backup data"
         required: false
         default: "false"
-        type: choice
-        options:
-          - "false"
-          - "true"
 
 jobs:
   build:
